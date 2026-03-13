@@ -1,0 +1,33 @@
+{
+	"$schema": "https://raw.githubusercontent.com/nicr9/schemas/main/tauri/2.0.0-beta.json",
+	"productName": "Claude Code PR Dashboard",
+	"version": "0.1.0",
+	"identifier": "com.claude-code-pr-dashboard",
+	"build": {
+		"frontendDist": "../dist",
+		"devUrl": "http://localhost:1420",
+		"beforeDevCommand": "npm run dev",
+		"beforeBuildCommand": "npm run build"
+	},
+	"app": {
+		"windows": [
+			{
+				"title": "Claude Code PR Dashboard",
+				"width": 1400,
+				"height": 900,
+				"resizable": true,
+				"fullscreen": false,
+				"minWidth": 800,
+				"minHeight": 600
+			}
+		],
+		"security": {
+			"csp": null
+		}
+	},
+	"plugins": {
+		"shell": {
+			"open": true
+		}
+	}
+}
