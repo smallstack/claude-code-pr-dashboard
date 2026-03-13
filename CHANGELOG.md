@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.1...claude-code-pr-dashboard-v0.1.2) (2026-03-13)
+
+
+### Bug Fixes
+
+* update schema path and add bundle configuration in tauri.conf.json ([fd77ff8](https://github.com/smallstack/claude-code-pr-dashboard/commit/fd77ff87446c440af91bba13ad9c8036eaf97fae))
+
 ## [0.1.1](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.0...claude-code-pr-dashboard-v0.1.1) (2026-03-13)
 
 
