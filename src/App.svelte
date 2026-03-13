@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import AuthCheck from "./lib/components/AuthCheck.svelte";
-	import Sidebar from "./lib/components/Sidebar.svelte";
 	import SessionArea from "./lib/components/SessionArea.svelte";
+	import Sidebar from "./lib/components/Sidebar.svelte";
 	import { prStore } from "./lib/stores/prs.svelte";
 
 	let authChecked = $state(false);

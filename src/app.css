@@ -39,16 +39,6 @@ body {
 	position: relative;
 }
 
-#app::before {
-	content: "";
-	position: absolute;
-	inset: 0;
-	background: url("/background.png") center no-repeat;
-	opacity: 0.05;
-	pointer-events: none;
-	z-index: 0;
-}
-
 button {
 	cursor: pointer;
 	font-family: inherit;

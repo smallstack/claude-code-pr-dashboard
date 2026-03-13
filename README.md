@@ -109,6 +109,19 @@ All settings are configured in the app's Settings panel (no environment variable
 | GitHub | gh CLI | PR data and authentication |
 | AI | Claude Code CLI | AI-powered code fixing |
 
+## Downloads
+
+Pre-built binaries are automatically published to [GitHub Releases](https://github.com/anthropics/claude-code-pr-dashboard/releases) for every release:
+
+| Platform | Formats |
+|----------|---------|
+| Linux | `.deb`, `.AppImage` |
+| Windows | `.msi`, `.exe` (NSIS installer) |
+| macOS (Apple Silicon) | `.dmg` |
+| macOS (Intel) | `.dmg` |
+
+> **Note:** Binaries are unsigned. On Windows you may see a SmartScreen warning, and on macOS a Gatekeeper prompt — both can be dismissed to proceed with installation.
+
 ## Limitations
 
 - **Max 5 sessions** — practical limit for side-by-side usability

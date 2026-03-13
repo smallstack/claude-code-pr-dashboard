@@ -42,9 +42,7 @@ class SessionStore {
 	}
 
 	updateStatus(id: string, status: Session["status"]) {
-		this.sessions = this.sessions.map((s) =>
-			s.id === id ? { ...s, status } : s
-		);
+		this.sessions = this.sessions.map((s) => (s.id === id ? { ...s, status } : s));
 	}
 }
 

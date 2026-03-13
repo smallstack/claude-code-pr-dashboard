@@ -1,0 +1,63 @@
+{
+	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"lineWidth": 120
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double",
+			"trailingCommas": "none"
+		}
+	},
+	"css": {
+		"linter": {
+			"enabled": true
+		}
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"nursery": {
+				"noFloatingPromises": "error",
+				"noShadow": "warn"
+			},
+			"suspicious": {
+				"noTemplateCurlyInString": "error"
+			},
+			"correctness": {
+				"noUnusedImports": "error"
+			},
+			"style": {
+				"useNodejsImportProtocol": "error"
+			}
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.svelte"],
+			"linter": {
+				"rules": {
+					"style": {
+						"useConst": "off",
+						"useImportType": "on"
+					},
+					"correctness": {
+						"noUnusedVariables": "off",
+						"noUnusedImports": "off"
+					}
+				}
+			},
+			"formatter": {
+				"enabled": false
+			}
+		}
+	]
+}

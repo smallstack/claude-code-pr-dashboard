@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { onMount, onDestroy } from "svelte";
+	
 	import { invoke } from "@tauri-apps/api/core";
 	import { listen } from "@tauri-apps/api/event";
-	import { Terminal } from "@xterm/xterm";
 	import { FitAddon } from "@xterm/addon-fit";
+	import { Terminal } from "@xterm/xterm";
+import { onDestroy, onMount } from "svelte";
 	import "@xterm/xterm/css/xterm.css";
-	import { sessionStore } from "../stores/sessions.svelte";
 	import { prStore } from "../stores/prs.svelte";
+	import { sessionStore } from "../stores/sessions.svelte";
 	import { settingsStore } from "../stores/settings.svelte";
 	import type { Session } from "../types";
 

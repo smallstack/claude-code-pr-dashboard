@@ -7,7 +7,10 @@
 	{#if sessionStore.count === 0}
 		<div class="empty-state">
 			<h1>No active sessions</h1>
-			<p>Select a PR from the sidebar to open a Claude Code session,<br />or click "+ New Shell Session" for a plain terminal.</p>
+			<p>
+				Select a PR from the sidebar to open a Claude Code session,<br
+				/>or click "+ New Shell Session" for a plain terminal.
+			</p>
 		</div>
 	{:else}
 		<div class="panels" style="--panel-count: {sessionStore.count}">
@@ -26,6 +29,16 @@
 		height: 100%;
 		overflow: hidden;
 		display: flex;
+	}
+
+	.session-area::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: url("/background.png") center center / cover no-repeat;
+		opacity: 0.05;
+		pointer-events: none;
+		z-index: 0;
 	}
 
 	.empty-state {

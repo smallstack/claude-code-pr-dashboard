@@ -19,7 +19,7 @@
 		timer = setInterval(() => {
 			countdown--;
 			if (countdown <= 0) {
-				prStore.fetchPrs();
+				void prStore.fetchPrs();
 				countdown = INTERVAL;
 			}
 		}, 1000);
