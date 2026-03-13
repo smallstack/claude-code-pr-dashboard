@@ -111,7 +111,7 @@ All settings are configured in the app's Settings panel (no environment variable
 
 ## Downloads
 
-Pre-built binaries are automatically published to [GitHub Releases](https://github.com/anthropics/claude-code-pr-dashboard/releases) for every release:
+Pre-built binaries are automatically published to [GitHub Releases](https://github.com/smallstack/claude-code-pr-dashboard/releases) for every release:
 
 | Platform | Formats |
 |----------|---------|
