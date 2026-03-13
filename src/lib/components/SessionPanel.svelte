@@ -16,6 +16,7 @@ import { onDestroy, onMount } from "svelte";
 	}
 
 	let { session }: Props = $props();
+	const justPassed = $derived(session.pr ? prStore.recentlyPassed.has(session.pr.number) : false);
 
 	let terminalEl: HTMLDivElement;
 	let terminal: Terminal;
@@ -144,7 +145,7 @@ import { onDestroy, onMount } from "svelte";
 	}
 </script>
 
-<div class="session-panel">
+<div class="session-panel" class:panel-just-passed={justPassed}>
 	<div class="panel-header">
 		<span class="panel-label">
 			{#if session.status === "fixing"}
@@ -177,6 +178,15 @@ import { onDestroy, onMount } from "svelte";
 		display: flex;
 		flex-direction: column;
 		background: var(--bg-primary);
+	}
+
+	.panel-just-passed {
+		animation: panel-highlight-flash 2s ease-out;
+	}
+
+	@keyframes panel-highlight-flash {
+		0% { box-shadow: inset 0 0 0 2px var(--success); }
+		100% { box-shadow: inset 0 0 0 2px transparent; }
 	}
 
 	.panel-header {
