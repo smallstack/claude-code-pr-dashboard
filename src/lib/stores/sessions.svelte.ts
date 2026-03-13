@@ -19,6 +19,10 @@ class SessionStore {
 		return this.sessions.length < MAX_SESSIONS;
 	}
 
+	getByPrNumber(prNumber: number): Session | undefined {
+		return this.sessions.find((s) => s.pr?.number === prNumber);
+	}
+
 	addSession(pr: PullRequest | null = null): Session | null {
 		if (!this.canAdd) return null;
 

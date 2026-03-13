@@ -4,8 +4,10 @@
 	import { listen } from "@tauri-apps/api/event";
 	import { Terminal } from "@xterm/xterm";
 	import { FitAddon } from "@xterm/addon-fit";
+	import "@xterm/xterm/css/xterm.css";
 	import { sessionStore } from "../stores/sessions.svelte";
 	import { prStore } from "../stores/prs.svelte";
+	import { settingsStore } from "../stores/settings.svelte";
 	import type { Session } from "../types";
 
 	interface Props {
@@ -54,18 +56,22 @@
 		const cols = terminal.cols;
 		const rows = terminal.rows;
 
-		// Create PTY session with home directory as default cwd
-		const cwd = "~";
-		await invoke("create_session", {
-			id: session.id,
-			cwd,
-			cols,
-			rows
-		});
+		// Track whether we need to auto-send /fix-pr once Claude is ready
+		let pendingFixPr = session.status === "fixing";
 
 		// Listen for PTY output
+		// xterm.js handles magnetic auto-scroll natively:
+		// auto-scrolls on new output, pauses when user scrolls up, resumes at bottom
 		const unlistenFn = await listen<string>(`pty-output-${session.id}`, (event) => {
 			terminal.write(event.payload);
+
+			// Detect when Claude CLI is ready (shows the > prompt) and send /fix-pr
+			if (pendingFixPr && event.payload.includes("❯")) {
+				pendingFixPr = false;
+				setTimeout(() => {
+					invoke("write_session", { id: session.id, data: "/fix-pr\r" }).catch(console.error);
+				}, 500);
+			}
 		});
 		unlisten = unlistenFn;
 
@@ -74,7 +80,41 @@
 			invoke("write_session", { id: session.id, data }).catch(console.error);
 		});
 
-		// Handle resize
+		// Spawn the session first, before setting up resize observer
+		const dockerArgs = {
+			githubToken: settingsStore.githubToken,
+			claudeCredentialsPath: settingsStore.claudeCredentialsPath,
+			claudeModel: settingsStore.claudeModel,
+			gitUserName: settingsStore.gitUserName,
+			gitUserEmail: settingsStore.gitUserEmail,
+		};
+
+		if (session.pr && session.status === "fixing") {
+			await invoke("auto_fix_pr", {
+				id: session.id,
+				repo: prStore.repo,
+				branch: session.pr.headRefName,
+				...dockerArgs,
+				cols,
+				rows
+			});
+		} else if (session.pr) {
+			await invoke("open_claude", {
+				id: session.id,
+				repo: prStore.repo,
+				...dockerArgs,
+				cols,
+				rows
+			});
+		} else {
+			await invoke("create_session", {
+				id: session.id,
+				cols,
+				rows
+			});
+		}
+
+		// Set up resize observer only after session exists
 		resizeObserver = new ResizeObserver(() => {
 			fitAddon.fit();
 			invoke("resize_session", {
@@ -84,34 +124,6 @@
 			}).catch(console.error);
 		});
 		resizeObserver.observe(terminalEl);
-
-		// If this session has a PR and is in "fixing" mode, run auto_fix_pr
-		if (session.pr && session.status === "fixing") {
-			// Small delay to let the shell initialize
-			setTimeout(async () => {
-				try {
-					await invoke("auto_fix_pr", {
-						id: session.id,
-						repoPath: ".",
-						branch: session.pr!.headRefName
-					});
-				} catch (e) {
-					console.error("auto_fix_pr failed:", e);
-				}
-			}, 1000);
-		} else if (session.pr) {
-			// Open Claude in the PR context
-			setTimeout(async () => {
-				try {
-					await invoke("open_claude", {
-						id: session.id,
-						repoPath: "."
-					});
-				} catch (e) {
-					console.error("open_claude failed:", e);
-				}
-			}, 500);
-		}
 	});
 
 	onDestroy(() => {
@@ -124,6 +136,11 @@
 	function handleClose() {
 		sessionStore.removeSession(session.id);
 	}
+
+	function handleAutoFix() {
+		invoke("write_session", { id: session.id, data: "/fix-pr\r" }).catch(console.error);
+		sessionStore.updateStatus(session.id, "fixing");
+	}
 </script>
 
 <div class="session-panel">
@@ -134,7 +151,19 @@
 			{/if}
 			{session.label}
 		</span>
-		<button class="close-btn" onclick={handleClose} title="Close session">x</button>
+		<div class="panel-actions">
+			{#if session.pr}
+				<button class="header-btn" onclick={handleAutoFix} title="Send /fix-pr">Fix</button>
+				<a
+					class="header-btn"
+					href={session.pr.url}
+					target="_blank"
+					rel="noopener noreferrer"
+					title="Open PR in browser"
+				>PR</a>
+			{/if}
+			<button class="close-btn" onclick={handleClose} title="Close session">x</button>
+		</div>
 	</div>
 	<div class="terminal-container" bind:this={terminalEl}></div>
 </div>
@@ -143,6 +172,7 @@
 	.session-panel {
 		flex: 1;
 		min-width: 0;
+		min-height: 0;
 		display: flex;
 		flex-direction: column;
 		background: var(--bg-primary);
@@ -180,6 +210,28 @@
 		50% { opacity: 0.3; }
 	}
 
+	.panel-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	.header-btn {
+		padding: 0.1rem 0.4rem;
+		font-size: 0.75rem;
+		background: var(--bg-tertiary);
+		color: var(--text-muted);
+		border: 1px solid var(--border);
+		border-radius: 3px;
+		text-decoration: none;
+		line-height: 1.3;
+	}
+
+	.header-btn:hover {
+		background: var(--bg-hover);
+		color: var(--text-primary);
+	}
+
 	.close-btn {
 		padding: 0 0.4rem;
 		background: none;
@@ -197,6 +249,7 @@
 
 	.terminal-container {
 		flex: 1;
+		min-height: 0;
 		padding: 4px;
 		overflow: hidden;
 	}

@@ -6,14 +6,16 @@ export interface PullRequest {
 	author: {
 		login: string;
 	};
+	url: string;
 	updatedAt: string;
 	statusCheckRollup: CheckStatus[];
 }
 
 export interface CheckStatus {
-	name: string;
-	status: string;
-	conclusion: string | null;
+	name?: string;
+	context?: string;
+	status?: string;
+	conclusion?: string | null;
 }
 
 export interface Session {

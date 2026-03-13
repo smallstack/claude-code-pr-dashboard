@@ -6,7 +6,7 @@
 <main class="session-area">
 	{#if sessionStore.count === 0}
 		<div class="empty-state">
-			<h2>No active sessions</h2>
+			<h1>No active sessions</h1>
 			<p>Select a PR from the sidebar to open a Claude Code session,<br />or click "+ New Shell Session" for a plain terminal.</p>
 		</div>
 	{:else}
@@ -21,6 +21,8 @@
 <style>
 	.session-area {
 		flex: 1;
+		min-width: 0;
+		min-height: 0;
 		height: 100%;
 		overflow: hidden;
 		display: flex;
@@ -32,7 +34,8 @@
 		align-items: center;
 		justify-content: center;
 		width: 100%;
-		color: var(--text-muted);
+		height: 100%;
+		color: var(--text-white);
 		gap: 0.5rem;
 	}
 

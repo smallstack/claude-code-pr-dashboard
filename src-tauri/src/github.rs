@@ -7,6 +7,7 @@ pub struct PullRequest {
     pub number: u32,
     pub title: String,
     pub head_ref_name: String,
+    pub url: String,
     pub state: String,
     pub author: Author,
     pub updated_at: String,
@@ -21,8 +22,13 @@ pub struct Author {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CheckStatus {
-    pub name: String,
-    pub status: String,
+    #[serde(default)]
+    pub name: Option<String>,
+    #[serde(default)]
+    pub context: Option<String>,
+    #[serde(default)]
+    pub status: Option<String>,
+    #[serde(default)]
     pub conclusion: Option<String>,
 }
 
@@ -56,7 +62,7 @@ pub fn fetch_prs(repo: &str) -> Result<Vec<PullRequest>, String> {
             "--repo",
             repo,
             "--json",
-            "number,title,headRefName,state,statusCheckRollup,author,updatedAt",
+            "number,title,headRefName,url,state,statusCheckRollup,author,updatedAt",
             "--limit",
             "50",
         ])
@@ -81,7 +87,7 @@ pub fn fetch_pr_detail(repo: &str, number: u32) -> Result<PullRequest, String> {
             "--repo",
             repo,
             "--json",
-            "number,title,headRefName,state,statusCheckRollup,author,updatedAt",
+            "number,title,headRefName,url,state,statusCheckRollup,author,updatedAt",
         ])
         .output()
         .map_err(|e| format!("Failed to run gh: {}", e))?;

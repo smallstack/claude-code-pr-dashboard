@@ -1,5 +1,5 @@
 use crate::github::{self, AuthStatus, PullRequest};
-use crate::pty::{self, SessionMap};
+use crate::pty::{self, DockerConfig, SessionMap};
 use tauri::{AppHandle, State};
 
 #[tauri::command]
@@ -25,11 +25,10 @@ pub fn create_session(
     app: AppHandle,
     sessions: State<'_, SessionMap>,
     id: String,
-    cwd: String,
     cols: u16,
     rows: u16,
 ) -> Result<(), String> {
-    pty::spawn_session(&app, &sessions, &id, &cwd, cols, rows)
+    pty::spawn_shell_session(&app, &sessions, &id, cols, rows)
 }
 
 #[tauri::command]
@@ -53,37 +52,54 @@ pub fn close_session(sessions: State<'_, SessionMap>, id: String) -> Result<(), 
 }
 
 #[tauri::command]
-pub fn auto_fix_pr(
+pub fn open_claude(
+    app: AppHandle,
     sessions: State<'_, SessionMap>,
     id: String,
-    repo_path: String,
-    branch: String,
+    repo: String,
+    github_token: String,
+    claude_credentials_path: String,
+    claude_model: String,
+    git_user_name: String,
+    git_user_email: String,
+    cols: u16,
+    rows: u16,
 ) -> Result<(), String> {
-    // Change to repo directory
-    pty::write_to_session(&sessions, &id, &format!("cd {}\n", repo_path))?;
-
-    // Checkout the PR branch
-    pty::write_to_session(&sessions, &id, &format!("git checkout {}\n", branch))?;
-
-    // Pull latest
-    pty::write_to_session(&sessions, &id, "git pull\n")?;
-
-    // Start Claude Code and run /fix-pr
-    pty::write_to_session(&sessions, &id, "claude\n")?;
-
-    // Give Claude a moment to start, then send the command
-    std::thread::sleep(std::time::Duration::from_secs(3));
-    pty::write_to_session(&sessions, &id, "/fix-pr\n")?;
-
-    Ok(())
+    let config = DockerConfig {
+        repo,
+        branch: None,
+        github_token,
+        claude_credentials_path,
+        claude_model,
+        git_user_name,
+        git_user_email,
+    };
+    pty::spawn_docker_session(&app, &sessions, &id, &config, cols, rows)
 }
 
 #[tauri::command]
-pub fn open_claude(
+pub fn auto_fix_pr(
+    app: AppHandle,
     sessions: State<'_, SessionMap>,
     id: String,
-    repo_path: String,
+    repo: String,
+    branch: String,
+    github_token: String,
+    claude_credentials_path: String,
+    claude_model: String,
+    git_user_name: String,
+    git_user_email: String,
+    cols: u16,
+    rows: u16,
 ) -> Result<(), String> {
-    pty::write_to_session(&sessions, &id, &format!("cd {} && claude\n", repo_path))?;
-    Ok(())
+    let config = DockerConfig {
+        repo,
+        branch: Some(branch),
+        github_token,
+        claude_credentials_path,
+        claude_model,
+        git_user_name,
+        git_user_email,
+    };
+    pty::spawn_docker_session(&app, &sessions, &id, &config, cols, rows)
 }
