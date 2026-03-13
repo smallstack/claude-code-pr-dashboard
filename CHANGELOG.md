@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.2...claude-code-pr-dashboard-v0.1.3) (2026-03-13)
+
+
+### Bug Fixes
+
+* replace confetti animation with PR/panel highlight flash ([55e0a25](https://github.com/smallstack/claude-code-pr-dashboard/commit/55e0a25f987db05887c3b2a39c29e5594791dbd5))
+
 ## [0.1.2](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.1...claude-code-pr-dashboard-v0.1.2) (2026-03-13)
 
 
