@@ -197,7 +197,7 @@
 		{#each prStore.prs as pr (pr.number)}
 			{@const status = ciStatus(pr)}
 			{@const activeSession = sessionStore.getByPrNumber(pr.number)}
-			<div class="pr-item" class:pr-active={!!activeSession}>
+			<div class="pr-item" class:pr-active={!!activeSession} class:pr-just-passed={prStore.recentlyPassed.has(pr.number)}>
 				<div class="pr-header">
 					<span class="ci-dot ci-{status}" title="CI: {status}"></span>
 					<span class="pr-number">#{pr.number}</span>
@@ -476,6 +476,15 @@
 
 	.pr-active {
 		border-left: 2px solid var(--accent);
+	}
+
+	.pr-just-passed {
+		animation: highlight-flash 2s ease-out;
+	}
+
+	@keyframes highlight-flash {
+		0% { background: color-mix(in srgb, var(--success) 40%, transparent); }
+		100% { background: transparent; }
 	}
 
 	.active-badge {
