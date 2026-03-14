@@ -16,18 +16,39 @@ pub fn create_session_map() -> SessionMap {
     Arc::new(Mutex::new(HashMap::new()))
 }
 
-/// Resolve the absolute path to the docker/ directory within the app.
-/// In dev mode, this is relative to the project root.
-/// In production, it's bundled as a Tauri resource.
-fn docker_dir() -> String {
-    // In dev, CARGO_MANIFEST_DIR points to src-tauri/
-    // The docker dir is at the project root: ../docker/
-    let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    let path = std::path::Path::new(manifest_dir)
-        .parent()
-        .unwrap()
-        .join("docker");
-    path.to_string_lossy().to_string()
+// Embed docker resource files at compile time so the binary is self-contained.
+const DOCKER_COMPOSE_YML: &str = include_str!("../../docker/docker-compose.yml");
+const DOCKERFILE: &str = include_str!("../../docker/Dockerfile");
+const ENTRYPOINT_SH: &str = include_str!("../../docker/entrypoint.sh");
+const FIX_PR_MD: &str = include_str!("../../docker/commands/fix-pr.md");
+const PREFLIGHT_MJS: &str = include_str!("../../docker/preflight.mjs");
+
+/// Extract embedded docker files to a temporary directory and return its path.
+/// The directory is placed under the system temp dir and reused across sessions
+/// so that Docker layer caching still works.
+fn docker_dir() -> Result<String, String> {
+    let dir = std::env::temp_dir().join("claude-code-pr-dashboard-docker");
+    let commands_dir = dir.join("commands");
+
+    std::fs::create_dir_all(&commands_dir)
+        .map_err(|e| format!("Failed to create docker resource dir: {}", e))?;
+
+    let write = |name: &str, content: &str| -> Result<(), String> {
+        let path = dir.join(name);
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent)
+                .map_err(|e| format!("Failed to create dir for {}: {}", name, e))?;
+        }
+        std::fs::write(&path, content).map_err(|e| format!("Failed to write {}: {}", name, e))
+    };
+
+    write("docker-compose.yml", DOCKER_COMPOSE_YML)?;
+    write("Dockerfile", DOCKERFILE)?;
+    write("entrypoint.sh", ENTRYPOINT_SH)?;
+    write("preflight.mjs", PREFLIGHT_MJS)?;
+    write("commands/fix-pr.md", FIX_PR_MD)?;
+
+    Ok(dir.to_string_lossy().to_string())
 }
 
 /// Check if docker is accessible without sudo
@@ -77,7 +98,9 @@ pub fn spawn_docker_session(
         return Err("GitHub token is not configured. Open Settings to set it.".to_string());
     }
     if config.claude_credentials_path.is_empty() {
-        return Err("Claude credentials path is not configured. Open Settings to set it.".to_string());
+        return Err(
+            "Claude credentials path is not configured. Open Settings to set it.".to_string(),
+        );
     }
 
     let pty_system = native_pty_system();
@@ -91,7 +114,7 @@ pub fn spawn_docker_session(
         })
         .map_err(|e| format!("Failed to open PTY: {}", e))?;
 
-    let docker_path = docker_dir();
+    let docker_path = docker_dir()?;
     let credentials_path = expand_tilde(&config.claude_credentials_path);
     let use_sudo = needs_sudo_for_docker();
 
@@ -109,12 +132,21 @@ pub fn spawn_docker_session(
         "run",
         "--rm",
         "--service-ports",
-        "-v", &format!("{}:/home/claude/.claude-host-credentials.json:ro", credentials_path),
-        "-e", &format!("REPO={}", config.repo),
-        "-e", &format!("GITHUB_TOKEN={}", config.github_token),
-        "-e", &format!("GIT_USER_NAME={}", config.git_user_name),
-        "-e", &format!("GIT_USER_EMAIL={}", config.git_user_email),
-        "-e", &format!("CLAUDE_MODEL={}", config.claude_model),
+        "-v",
+        &format!(
+            "{}:/home/claude/.claude-host-credentials.json:ro",
+            credentials_path
+        ),
+        "-e",
+        &format!("REPO={}", config.repo),
+        "-e",
+        &format!("GITHUB_TOKEN={}", config.github_token),
+        "-e",
+        &format!("GIT_USER_NAME={}", config.git_user_name),
+        "-e",
+        &format!("GIT_USER_EMAIL={}", config.git_user_email),
+        "-e",
+        &format!("CLAUDE_MODEL={}", config.claude_model),
     ]);
 
     if let Some(ref b) = config.branch {
@@ -269,12 +301,7 @@ pub fn close_session(sessions: &SessionMap, id: &str) -> Result<(), String> {
     Ok(())
 }
 
-pub fn resize_session(
-    sessions: &SessionMap,
-    id: &str,
-    cols: u16,
-    rows: u16,
-) -> Result<(), String> {
+pub fn resize_session(sessions: &SessionMap, id: &str, cols: u16, rows: u16) -> Result<(), String> {
     let map = sessions.lock().unwrap();
     let session = map
         .get(id)
