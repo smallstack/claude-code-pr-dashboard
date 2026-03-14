@@ -16,18 +16,40 @@ pub fn create_session_map() -> SessionMap {
     Arc::new(Mutex::new(HashMap::new()))
 }
 
-/// Resolve the absolute path to the docker/ directory within the app.
-/// In dev mode, this is relative to the project root.
-/// In production, it's bundled as a Tauri resource.
-fn docker_dir() -> String {
-    // In dev, CARGO_MANIFEST_DIR points to src-tauri/
-    // The docker dir is at the project root: ../docker/
-    let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    let path = std::path::Path::new(manifest_dir)
-        .parent()
-        .unwrap()
-        .join("docker");
-    path.to_string_lossy().to_string()
+// Embed docker resource files at compile time so the binary is self-contained.
+const DOCKER_COMPOSE_YML: &str = include_str!("../../docker/docker-compose.yml");
+const DOCKERFILE: &str = include_str!("../../docker/Dockerfile");
+const ENTRYPOINT_SH: &str = include_str!("../../docker/entrypoint.sh");
+const FIX_PR_MD: &str = include_str!("../../docker/commands/fix-pr.md");
+const PREFLIGHT_MJS: &str = include_str!("../../docker/preflight.mjs");
+
+/// Extract embedded docker files to a temporary directory and return its path.
+/// The directory is placed under the system temp dir and reused across sessions
+/// so that Docker layer caching still works.
+fn docker_dir() -> Result<String, String> {
+    let dir = std::env::temp_dir().join("claude-code-pr-dashboard-docker");
+    let commands_dir = dir.join("commands");
+
+    std::fs::create_dir_all(&commands_dir)
+        .map_err(|e| format!("Failed to create docker resource dir: {}", e))?;
+
+    let write = |name: &str, content: &str| -> Result<(), String> {
+        let path = dir.join(name);
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent)
+                .map_err(|e| format!("Failed to create dir for {}: {}", name, e))?;
+        }
+        std::fs::write(&path, content)
+            .map_err(|e| format!("Failed to write {}: {}", name, e))
+    };
+
+    write("docker-compose.yml", DOCKER_COMPOSE_YML)?;
+    write("Dockerfile", DOCKERFILE)?;
+    write("entrypoint.sh", ENTRYPOINT_SH)?;
+    write("preflight.mjs", PREFLIGHT_MJS)?;
+    write("commands/fix-pr.md", FIX_PR_MD)?;
+
+    Ok(dir.to_string_lossy().to_string())
 }
 
 /// Check if docker is accessible without sudo
@@ -91,7 +113,7 @@ pub fn spawn_docker_session(
         })
         .map_err(|e| format!("Failed to open PTY: {}", e))?;
 
-    let docker_path = docker_dir();
+    let docker_path = docker_dir()?;
     let credentials_path = expand_tilde(&config.claude_credentials_path);
     let use_sudo = needs_sudo_for_docker();
 
