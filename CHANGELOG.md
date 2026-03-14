@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.3...claude-code-pr-dashboard-v0.1.4) (2026-03-14)
+
+
+### Bug Fixes
+
+* sync tauri and cargo version with package.json for correct release artifacts ([bcbb138](https://github.com/smallstack/claude-code-pr-dashboard/commit/bcbb138bb4a57d7431e74f37ced3167d5f1269a1))
+
 ## [0.1.3](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.2...claude-code-pr-dashboard-v0.1.3) (2026-03-13)
 
 
