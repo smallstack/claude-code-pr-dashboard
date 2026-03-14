@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.4...claude-code-pr-dashboard-v0.1.5) (2026-03-14)
+
+
+### Bug Fixes
+
+* embed docker files in binary instead of using compile-time path ([77bcecf](https://github.com/smallstack/claude-code-pr-dashboard/commit/77bcecfacb207ae570344cfb3fbddb7ffe47666c))
+
 ## [0.1.4](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.3...claude-code-pr-dashboard-v0.1.4) (2026-03-14)
 
 
