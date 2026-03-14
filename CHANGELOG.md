@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.6](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.5...claude-code-pr-dashboard-v0.1.6) (2026-03-14)
+
+
+### Features
+
+* add CLAUDE.md for project documentation and update package scripts ([1a34df3](https://github.com/smallstack/claude-code-pr-dashboard/commit/1a34df3822fe2e4d6de837e438d9c2c4dd578789))
+
+
+### Bug Fixes
+
+* add Volta configuration for Node.js version 24.14.0 ([5c4af23](https://github.com/smallstack/claude-code-pr-dashboard/commit/5c4af238196060e8fc20df6850c1770a2177e8dc))
+
 ## [0.1.5](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.4...claude-code-pr-dashboard-v0.1.5) (2026-03-14)
 
 
