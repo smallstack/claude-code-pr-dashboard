@@ -21,6 +21,22 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
+      - name: Format release-please changes
+        if: ${{ steps.release.outputs.prs_created == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_BRANCH=$(gh pr view ${{ fromJson(steps.release.outputs.pr).number }} --json headRefName -q .headRefName)
+          git fetch origin "$PR_BRANCH"
+          git checkout "$PR_BRANCH"
+          npm ci
+          npx @biomejs/biome check --fix
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --staged --quiet || git commit -m "chore: format release-please changes"
+          git push
+
   build-tauri:
     needs: release-please
     if: ${{ needs.release-please.outputs.releases_created == 'true' }}
