@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.7](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.6...claude-code-pr-dashboard-v0.1.7) (2026-03-14)
+
+
+### Features
+
+* add formatting step for release-please changes in workflow ([64f13a2](https://github.com/smallstack/claude-code-pr-dashboard/commit/64f13a2b3e56478f28bbd4bf7f46a880c4178e70))
+
+
+### Bug Fixes
+
+* streamline icon array formatting in tauri configuration ([75cbf38](https://github.com/smallstack/claude-code-pr-dashboard/commit/75cbf38efeb058f4b733c1b2505bef6b3da18ff7))
+
 ## [0.1.6](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.5...claude-code-pr-dashboard-v0.1.6) (2026-03-14)
 
 
