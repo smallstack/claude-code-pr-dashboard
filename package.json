@@ -11,6 +11,7 @@
 		"lint": "npx @biomejs/biome check --diagnostic-level=error",
 		"lint:fix": "npm run lint -- --fix",
 		"tauri": "tauri",
+		"tauri:dev": "tauri dev",
 		"docker:rebuild": "sudo docker compose -f docker/docker-compose.yml build --no-cache"
 	},
 	"dependencies": {
