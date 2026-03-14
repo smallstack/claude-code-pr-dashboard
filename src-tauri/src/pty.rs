@@ -39,8 +39,7 @@ fn docker_dir() -> Result<String, String> {
             std::fs::create_dir_all(parent)
                 .map_err(|e| format!("Failed to create dir for {}: {}", name, e))?;
         }
-        std::fs::write(&path, content)
-            .map_err(|e| format!("Failed to write {}: {}", name, e))
+        std::fs::write(&path, content).map_err(|e| format!("Failed to write {}: {}", name, e))
     };
 
     write("docker-compose.yml", DOCKER_COMPOSE_YML)?;
@@ -99,7 +98,9 @@ pub fn spawn_docker_session(
         return Err("GitHub token is not configured. Open Settings to set it.".to_string());
     }
     if config.claude_credentials_path.is_empty() {
-        return Err("Claude credentials path is not configured. Open Settings to set it.".to_string());
+        return Err(
+            "Claude credentials path is not configured. Open Settings to set it.".to_string(),
+        );
     }
 
     let pty_system = native_pty_system();
@@ -131,12 +132,21 @@ pub fn spawn_docker_session(
         "run",
         "--rm",
         "--service-ports",
-        "-v", &format!("{}:/home/claude/.claude-host-credentials.json:ro", credentials_path),
-        "-e", &format!("REPO={}", config.repo),
-        "-e", &format!("GITHUB_TOKEN={}", config.github_token),
-        "-e", &format!("GIT_USER_NAME={}", config.git_user_name),
-        "-e", &format!("GIT_USER_EMAIL={}", config.git_user_email),
-        "-e", &format!("CLAUDE_MODEL={}", config.claude_model),
+        "-v",
+        &format!(
+            "{}:/home/claude/.claude-host-credentials.json:ro",
+            credentials_path
+        ),
+        "-e",
+        &format!("REPO={}", config.repo),
+        "-e",
+        &format!("GITHUB_TOKEN={}", config.github_token),
+        "-e",
+        &format!("GIT_USER_NAME={}", config.git_user_name),
+        "-e",
+        &format!("GIT_USER_EMAIL={}", config.git_user_email),
+        "-e",
+        &format!("CLAUDE_MODEL={}", config.claude_model),
     ]);
 
     if let Some(ref b) = config.branch {
@@ -291,12 +301,7 @@ pub fn close_session(sessions: &SessionMap, id: &str) -> Result<(), String> {
     Ok(())
 }
 
-pub fn resize_session(
-    sessions: &SessionMap,
-    id: &str,
-    cols: u16,
-    rows: u16,
-) -> Result<(), String> {
+pub fn resize_session(sessions: &SessionMap, id: &str, cols: u16, rows: u16) -> Result<(), String> {
     let map = sessions.lock().unwrap();
     let session = map
         .get(id)

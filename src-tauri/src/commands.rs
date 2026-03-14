@@ -32,7 +32,11 @@ pub fn create_session(
 }
 
 #[tauri::command]
-pub fn write_session(sessions: State<'_, SessionMap>, id: String, data: String) -> Result<(), String> {
+pub fn write_session(
+    sessions: State<'_, SessionMap>,
+    id: String,
+    data: String,
+) -> Result<(), String> {
     pty::write_to_session(&sessions, &id, &data)
 }
 
