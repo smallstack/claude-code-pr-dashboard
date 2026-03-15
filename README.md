@@ -2,6 +2,8 @@
 
 **Is PR review and CI fixing the bottleneck in your AI-powered development workflow?** If you're running multiple Claude Code sessions across separate terminals, each paired with a browser tab to track the corresponding PR, this tool is for you. Manage all your open PRs in one place, spawn isolated Claude Code sessions per PR, and let them autonomously fix CI failures and address review comments — in parallel, with a single click.
 
+![Claude Code PR Dashboard](https://raw.githubusercontent.com/smallstack/claude-code-pr-dashboard/main/images/screenshot.png)
+
 ## Why?
 
 A typical AI-assisted dev workflow looks like this: plan a task in Claude Code, let it implement, steer when needed, run `/fix-pr` to polish, then track the PR in the browser. Doing this across 3+ parallel workstreams means juggling terminal windows and browser tabs with no connection between them.
