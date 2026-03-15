@@ -48,6 +48,15 @@ fn docker_dir() -> Result<String, String> {
     write("preflight.mjs", PREFLIGHT_MJS)?;
     write("commands/fix-pr.md", FIX_PR_MD)?;
 
+    // Ensure entrypoint.sh is executable so Docker COPY preserves the permission
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let entrypoint = dir.join("entrypoint.sh");
+        std::fs::set_permissions(&entrypoint, std::fs::Permissions::from_mode(0o755))
+            .map_err(|e| format!("Failed to chmod entrypoint.sh: {}", e))?;
+    }
+
     Ok(dir.to_string_lossy().to_string())
 }
 
@@ -130,6 +139,7 @@ pub fn spawn_docker_session(
         "-f",
         &format!("{}/docker-compose.yml", docker_path),
         "run",
+        "--build",
         "--rm",
         "--service-ports",
         "-v",

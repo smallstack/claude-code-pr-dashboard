@@ -24,11 +24,12 @@ RUN npm install -g @anthropic-ai/claude-code
 # Create a non-root user
 RUN useradd -m -s /bin/bash claude && echo "claude ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+# Copy entrypoint and bundled commands (before USER switch so they're owned by root)
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY commands/ /usr/local/share/claude-commands/
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 USER claude
 WORKDIR /home/claude
 
-# Copy entrypoint and bundled commands
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY commands/ /usr/local/share/claude-commands/
-
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
