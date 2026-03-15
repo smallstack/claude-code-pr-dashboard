@@ -25,8 +25,8 @@ fi
 gh auth setup-git
 
 # Configure git user (use env vars or sensible defaults)
-git config --global user.email "${GIT_USER_EMAIL:-claude-bot@users.noreply.github.com}"
-git config --global user.name "${GIT_USER_NAME:-Claude Code}"
+git config --global user.email "${GIT_USER_EMAIL}"
+git config --global user.name "${GIT_USER_NAME}"
 
 # Clone the repository
 REPO_DIR="/home/claude/workspace"
