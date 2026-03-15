@@ -66,6 +66,7 @@ pub fn open_claude(
     claude_model: String,
     git_user_name: String,
     git_user_email: String,
+    docker_template: String,
     cols: u16,
     rows: u16,
 ) -> Result<(), String> {
@@ -77,6 +78,7 @@ pub fn open_claude(
         claude_model,
         git_user_name,
         git_user_email,
+        docker_template,
     };
     pty::spawn_docker_session(&app, &sessions, &id, &config, cols, rows)
 }
@@ -93,6 +95,7 @@ pub fn auto_fix_pr(
     claude_model: String,
     git_user_name: String,
     git_user_email: String,
+    docker_template: String,
     cols: u16,
     rows: u16,
 ) -> Result<(), String> {
@@ -104,6 +107,7 @@ pub fn auto_fix_pr(
         claude_model,
         git_user_name,
         git_user_email,
+        docker_template,
     };
     pty::spawn_docker_session(&app, &sessions, &id, &config, cols, rows)
 }

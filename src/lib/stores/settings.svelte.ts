@@ -4,6 +4,7 @@ class SettingsStore {
 	claudeModel = $state(localStorage.getItem("pr-dashboard-claude-model") ?? "sonnet");
 	gitUserName = $state(localStorage.getItem("pr-dashboard-git-name") ?? "");
 	gitUserEmail = $state(localStorage.getItem("pr-dashboard-git-email") ?? "");
+	dockerTemplate = $state(localStorage.getItem("pr-dashboard-docker-template") ?? "default");
 
 	get isConfigured(): boolean {
 		return this.githubToken.length > 0 && this.claudeCredentialsPath.length > 0;
@@ -32,6 +33,11 @@ class SettingsStore {
 	setGitUserEmail(email: string) {
 		this.gitUserEmail = email;
 		localStorage.setItem("pr-dashboard-git-email", email);
+	}
+
+	setDockerTemplate(template: string) {
+		this.dockerTemplate = template;
+		localStorage.setItem("pr-dashboard-docker-template", template);
 	}
 }
 
