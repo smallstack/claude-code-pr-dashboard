@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.8](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.7...claude-code-pr-dashboard-v0.1.8) (2026-03-15)
+
+
+### Features
+
+* Add docker compose templates and PR session title ([a1a7784](https://github.com/smallstack/claude-code-pr-dashboard/commit/a1a778426c66fd73763218a6a02ff856aba792c9))
+
+
+### Bug Fixes
+
+* add proper permissions for temp files ([522a9aa](https://github.com/smallstack/claude-code-pr-dashboard/commit/522a9aa2f126da574186fefe52a00eae4e953d55))
+* linter issues ([731b0c5](https://github.com/smallstack/claude-code-pr-dashboard/commit/731b0c52625b0e55b1f4d72ecae83e6b00ac8495))
+* Use 1:1 git configs ([152c125](https://github.com/smallstack/claude-code-pr-dashboard/commit/152c125361194cd5d7a587c2c6336c77a5dab03a))
+
 ## [0.1.7](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.6...claude-code-pr-dashboard-v0.1.7) (2026-03-14)
 
 
