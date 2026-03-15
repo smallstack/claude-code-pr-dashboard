@@ -149,6 +149,18 @@
 					class="settings-input"
 				/>
 			</label>
+			<label class="settings-field">
+				<span class="settings-label">Docker Template</span>
+				<select
+					value={settingsStore.dockerTemplate}
+					onchange={(e) => settingsStore.setDockerTemplate(e.currentTarget.value)}
+					class="settings-input"
+				>
+					<option value="default">Default</option>
+					<option value="mongodb">MongoDB</option>
+					<option value="mongodb-replicaset">MongoDB ReplicaSet</option>
+				</select>
+			</label>
 			{#if !settingsStore.isConfigured}
 				<div class="settings-warning">GitHub Token and Claude Credentials Path are required.</div>
 			{/if}

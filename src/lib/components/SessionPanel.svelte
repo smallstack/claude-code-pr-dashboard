@@ -89,6 +89,7 @@ import { onDestroy, onMount } from "svelte";
 			claudeModel: settingsStore.claudeModel,
 			gitUserName: settingsStore.gitUserName,
 			gitUserEmail: settingsStore.gitUserEmail,
+			dockerTemplate: settingsStore.dockerTemplate,
 		};
 
 		if (session.pr && session.status === "fixing") {
@@ -152,6 +153,9 @@ import { onDestroy, onMount } from "svelte";
 				<span class="fixing-indicator"></span>
 			{/if}
 			{session.label}
+			{#if session.pr}
+				<span class="panel-pr-title" title={session.pr.title}>{session.pr.title}</span>
+			{/if}
 		</span>
 		<div class="panel-actions">
 			{#if session.pr}
@@ -206,6 +210,17 @@ import { onDestroy, onMount } from "svelte";
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	.panel-pr-title {
+		color: var(--text-muted);
+		font-weight: 400;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		min-width: 0;
 	}
 
 	.fixing-indicator {

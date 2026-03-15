@@ -18,6 +18,9 @@ pub fn create_session_map() -> SessionMap {
 
 // Embed docker resource files at compile time so the binary is self-contained.
 const DOCKER_COMPOSE_YML: &str = include_str!("../../docker/docker-compose.yml");
+const DOCKER_COMPOSE_MONGODB_YML: &str = include_str!("../../docker/docker-compose.mongodb.yml");
+const DOCKER_COMPOSE_MONGODB_RS_YML: &str =
+    include_str!("../../docker/docker-compose.mongodb-replicaset.yml");
 const DOCKERFILE: &str = include_str!("../../docker/Dockerfile");
 const ENTRYPOINT_SH: &str = include_str!("../../docker/entrypoint.sh");
 const FIX_PR_MD: &str = include_str!("../../docker/commands/fix-pr.md");
@@ -43,6 +46,11 @@ fn docker_dir() -> Result<String, String> {
     };
 
     write("docker-compose.yml", DOCKER_COMPOSE_YML)?;
+    write("docker-compose.mongodb.yml", DOCKER_COMPOSE_MONGODB_YML)?;
+    write(
+        "docker-compose.mongodb-replicaset.yml",
+        DOCKER_COMPOSE_MONGODB_RS_YML,
+    )?;
     write("Dockerfile", DOCKERFILE)?;
     write("entrypoint.sh", ENTRYPOINT_SH)?;
     write("preflight.mjs", PREFLIGHT_MJS)?;
@@ -79,6 +87,7 @@ pub struct DockerConfig {
     pub claude_model: String,
     pub git_user_name: String,
     pub git_user_email: String,
+    pub docker_template: String,
 }
 
 /// Expand ~ at the start of a path to the user's home directory.
@@ -127,6 +136,15 @@ pub fn spawn_docker_session(
     let credentials_path = expand_tilde(&config.claude_credentials_path);
     let use_sudo = needs_sudo_for_docker();
 
+    let compose_file = match config.docker_template.as_str() {
+        "mongodb" => "docker-compose.mongodb.yml",
+        "mongodb-replicaset" => "docker-compose.mongodb-replicaset.yml",
+        _ => "docker-compose.yml",
+    };
+
+    // Use a per-session project name so each session gets its own sidecar containers
+    let project_name = format!("claude-pr-{}", id);
+
     let mut cmd = if use_sudo {
         let mut c = CommandBuilder::new("sudo");
         c.args(["-E", "docker"]);
@@ -136,15 +154,17 @@ pub fn spawn_docker_session(
     };
     cmd.args([
         "compose",
+        "-p",
+        &project_name,
         "-f",
-        &format!("{}/docker-compose.yml", docker_path),
+        &format!("{}/{}", docker_path, compose_file),
         "run",
         "--build",
         "--rm",
         "--service-ports",
         "-v",
         &format!(
-            "{}:/home/claude/.claude-host-credentials.json:ro",
+            "{}:/home/claude/.claude-host-credentials.json:rw",
             credentials_path
         ),
         "-e",
@@ -308,6 +328,25 @@ pub fn close_session(sessions: &SessionMap, id: &str) -> Result<(), String> {
     let mut map = sessions.lock().unwrap();
     map.remove(id)
         .ok_or_else(|| format!("Session {} not found", id))?;
+
+    // Tear down the compose project (sidecar containers) in the background
+    let project_name = format!("claude-pr-{}", id);
+    let use_sudo = needs_sudo_for_docker();
+    thread::spawn(move || {
+        let mut cmd = if use_sudo {
+            let mut c = std::process::Command::new("sudo");
+            c.args(["-E", "docker"]);
+            c
+        } else {
+            std::process::Command::new("docker")
+        };
+        cmd.args(["compose", "-p", &project_name, "down"]);
+        let _ = cmd
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .status();
+    });
+
     Ok(())
 }
 

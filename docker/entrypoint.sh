@@ -14,11 +14,20 @@ if [ -n "$GITHUB_TOKEN" ]; then
 	export GH_TOKEN="$GITHUB_TOKEN"
 fi
 
-# Copy host auth credentials (single file mount, may be owned by different uid)
+# Copy host auth credentials (mounted rw so we can sync refreshed tokens back)
 mkdir -p /home/claude/.claude
 if [ -f "/home/claude/.claude-host-credentials.json" ]; then
 	sudo cp /home/claude/.claude-host-credentials.json /home/claude/.claude/.credentials.json
 	sudo chown claude:claude /home/claude/.claude/.credentials.json
+
+	# Background sync: when Claude Code refreshes the token inside the container,
+	# copy it back to the host mount so future sessions get the fresh token.
+	(while sleep 30; do
+		if [ -f "/home/claude/.claude/.credentials.json" ] && \
+		   ! diff -q /home/claude/.claude/.credentials.json /home/claude/.claude-host-credentials.json >/dev/null 2>&1; then
+			sudo cp /home/claude/.claude/.credentials.json /home/claude/.claude-host-credentials.json
+		fi
+	done) &
 fi
 
 # Use gh as git credential helper so fetch/pull/push work with GITHUB_TOKEN
