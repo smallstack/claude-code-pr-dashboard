@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.9](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.8...claude-code-pr-dashboard-v0.1.9) (2026-03-23)
+
+
+### Features
+
+* add shell-only mode and new command to open docker shell ([115df43](https://github.com/smallstack/claude-code-pr-dashboard/commit/115df439b9697e14d4e1d1b3ffebfcd7bbe52c12))
+
+
+### Bug Fixes
+
+* streamline icon array formatting in tauri configuration ([65993c1](https://github.com/smallstack/claude-code-pr-dashboard/commit/65993c154b8a8e3cb876295bcb9fa59fa770f0d0))
+
 ## [0.1.8](https://github.com/smallstack/claude-code-pr-dashboard/compare/claude-code-pr-dashboard-v0.1.7...claude-code-pr-dashboard-v0.1.8) (2026-03-15)
 
 
