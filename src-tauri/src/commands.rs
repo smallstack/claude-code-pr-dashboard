@@ -79,6 +79,41 @@ pub fn open_claude(
         git_user_name,
         git_user_email,
         docker_template,
+        shell_only: false,
+    };
+    pty::spawn_docker_session(&app, &sessions, &id, &config, cols, rows)
+}
+
+#[tauri::command]
+pub fn open_docker_shell(
+    app: AppHandle,
+    sessions: State<'_, SessionMap>,
+    id: String,
+    repo: String,
+    branch: String,
+    github_token: String,
+    claude_credentials_path: String,
+    claude_model: String,
+    git_user_name: String,
+    git_user_email: String,
+    docker_template: String,
+    cols: u16,
+    rows: u16,
+) -> Result<(), String> {
+    let config = DockerConfig {
+        repo,
+        branch: if branch.is_empty() {
+            None
+        } else {
+            Some(branch)
+        },
+        github_token,
+        claude_credentials_path,
+        claude_model,
+        git_user_name,
+        git_user_email,
+        docker_template,
+        shell_only: true,
     };
     pty::spawn_docker_session(&app, &sessions, &id, &config, cols, rows)
 }
@@ -108,6 +143,7 @@ pub fn auto_fix_pr(
         git_user_name,
         git_user_email,
         docker_template,
+        shell_only: false,
     };
     pty::spawn_docker_session(&app, &sessions, &id, &config, cols, rows)
 }

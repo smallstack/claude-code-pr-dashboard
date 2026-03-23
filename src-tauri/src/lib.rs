@@ -19,6 +19,7 @@ pub fn run() {
             commands::close_session,
             commands::auto_fix_pr,
             commands::open_claude,
+            commands::open_docker_shell,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

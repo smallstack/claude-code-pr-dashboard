@@ -110,8 +110,11 @@ import { onDestroy, onMount } from "svelte";
 				rows
 			});
 		} else {
-			await invoke("create_session", {
+			await invoke("open_docker_shell", {
+				...dockerArgs,
 				id: session.id,
+				repo: prStore.repo,
+				branch: "",
 				cols,
 				rows
 			});

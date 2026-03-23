@@ -88,6 +88,7 @@ pub struct DockerConfig {
     pub git_user_name: String,
     pub git_user_email: String,
     pub docker_template: String,
+    pub shell_only: bool,
 }
 
 /// Expand ~ at the start of a path to the user's home directory.
@@ -181,6 +182,10 @@ pub fn spawn_docker_session(
 
     if let Some(ref b) = config.branch {
         cmd.args(["-e", &format!("BRANCH={}", b)]);
+    }
+
+    if config.shell_only {
+        cmd.args(["-e", "SHELL_ONLY=1"]);
     }
 
     cmd.arg("claude");

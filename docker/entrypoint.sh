@@ -79,6 +79,12 @@ node -e "
 	fs.writeFileSync('$CONFIG_FILE', JSON.stringify(cfg));
 "
 
+# Shell-only mode: drop into bash instead of launching Claude
+if [ -n "$SHELL_ONLY" ]; then
+	echo "--- Shell session ready ---"
+	exec bash
+fi
+
 # Launch claude with dangerously-skip-permissions (safe inside container)
 MODEL_FLAG=""
 if [ -n "$CLAUDE_MODEL" ]; then
